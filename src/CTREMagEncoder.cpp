@@ -38,8 +38,6 @@ Rotation2D CTREMagEncoder::GetAngle() const {
 }
 
 int CTREMagEncoder::GetRotations() const {
-	SmartDashboard::PutNumber("Rotations", GetEncoderTicks(true)/4096);
-	SmartDashboard::PutNumber("dummy", -16/4096);
 	return GetEncoderTicks(true) / 4096;
 }
 
@@ -60,21 +58,22 @@ void CTREMagEncoder::Calibrate() {
 
 int CTREMagEncoder::ConvertAngleToSetpoint(Rotation2D targetAngle) {
 	Rotation2D angle = targetAngle.rotateBy(m_offset);
-	SmartDashboard::PutNumber("Convert Angle To Setpoint Angle", angle.getDegrees());
-	int ticks = ConvertAngleToEncoderTicks(angle);
-	SmartDashboard::PutNumber("Convert Angle To Setpoint Ticks", ticks);
-	//ticks += GetRotations() * 4096;
+	
+	int ticks = ConvertAngleToEncoderTicks(angle); // 0 - 4096
+	
 	int encoderTicks = GetEncoderTicks(true);
-	ticks += (encoderTicks/4096)*4096;
+	ticks += (encoderTicks/4096)*4096; //Add ticks equivalent to full rotations on encoder.
+	
 	int error = encoderTicks - ticks;
-	SmartDashboard::PutNumber("Convert Angle To Setpoint Error", error);
+
+	// Ensure the movement is <= 180 deg (2048 encoder ticks)
 	if (error < -2048) {
 		ticks -= 4096;
 	}
 	else if (error > 2048) {
 		ticks += 4096;
 	}
-	SmartDashboard::PutNumber("Convert Angle To Setpoint Error2", GetEncoderTicks(true) - ticks);
+
 	return ticks;
 }
 
