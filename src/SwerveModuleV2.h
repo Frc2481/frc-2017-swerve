@@ -9,7 +9,7 @@
 #define SRC_SWERVEMODULEV2_H_
 
 #include <WPILib.h>
-#include "CANTalon.h"
+#include "ctre/Phoenix.h"
 //#include "RobotParameters.h"
 #include "utils\Translation2D.h"
 
@@ -18,8 +18,8 @@ class GreyhillEncoder;
 
 class SwerveModuleV2 {
 private:
-	CANTalon *m_steerMotor;
-	CANTalon *m_driveMotor;
+	TalonSRX *m_steerMotor;
+	TalonSRX *m_driveMotor;
 	CTREMagEncoder *m_steerEncoder;
 	GreyhillEncoder *m_driveEncoder;
 	bool m_optimizationEnabled;

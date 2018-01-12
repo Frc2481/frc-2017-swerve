@@ -8,12 +8,12 @@
 #ifndef SRC_GREYHILLENCODER_H_
 #define SRC_GREYHILLENCODER_H_
 
-#include "CANTalon.h"
+#include "ctre/Phoenix.h"
 #include "utils/Translation2D.h"
 
 class GreyhillEncoder {
 	private:
-	CANTalon* m_talon;
+	TalonSRX* m_talon;
 	std::string m_name;
 	std::string m_calibrationKey;
 	Translation2D m_offset;
@@ -21,16 +21,18 @@ class GreyhillEncoder {
 	int m_inchesPerRev;
 
 public:
-	GreyhillEncoder(CANTalon* talon, const std::string& name, int ticksPerRev, int inchesPerRev);
+	GreyhillEncoder(TalonSRX* talon, const std::string& name, int ticksPerRev, int inchesPerRev);
 	virtual ~GreyhillEncoder();
 	Translation2D GetRawDistance() const;
 	Translation2D GetDistance() const;
 	double GetSpeed() const;
 	int GetRotations() const;
 	int GetPosition() const;
-	double ConvertRotationsToInches(int rotations) const;
-	int ConvertInchesToRotations(const Translation2D& inches);
-	void SetEncoderRaw(int ticks);
+	double ConvertRotationsToInches(double rotations) const;
+	double ConvertInchesToRotations(double inches) const;
+	int ConvertRotationsToTicks(double rotations) const;
+	double ConvertTicksToRotations(int ticks) const;
+	void SetEncoderRaw(int ticks, int timeOut = 0);
 	void Reset();
 };
 

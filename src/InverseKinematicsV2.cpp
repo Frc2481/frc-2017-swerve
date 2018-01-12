@@ -7,6 +7,7 @@
 
 #include "InverseKinematicsV2.h"
 #include <Components/SwerveModuleV2Constants.h>
+#include <cmath>
 #include <algorithm>
 
 

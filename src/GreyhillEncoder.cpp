@@ -9,12 +9,11 @@
 #include <sstream>
 #include <WPILib.h>
 
-GreyhillEncoder::GreyhillEncoder(CANTalon* talon, const std::string& name, int ticksPerRev, int inchesPerRev)
+GreyhillEncoder::GreyhillEncoder(TalonSRX* talon, const std::string& name, int ticksPerRev, int inchesPerRev)
 	: m_talon(talon), m_name(name), m_ticksPerRev(ticksPerRev), m_inchesPerRev(inchesPerRev) {
 
-	m_talon->ConfigEncoderCodesPerRev(ticksPerRev);
-	m_talon->SetFeedbackDevice(CANTalon::QuadEncoder);
-	m_talon->SetStatusFrameRateMs(CANTalon::StatusFrameRateFeedback, 10);
+	m_talon->GetSelectedSensorPosition(QuadEncoder);
+	m_talon->SetStatusFramePeriod(Status_2_Feedback0, 10, 0);
 }
 
 GreyhillEncoder::~GreyhillEncoder() {
@@ -30,23 +29,35 @@ Translation2D GreyhillEncoder::GetDistance() const {
 }
 
 int GreyhillEncoder::GetPosition() const {
-	return m_talon->GetPosition();
+	return m_talon->GetSelectedSensorPosition(0);
 }
 
-double GreyhillEncoder::ConvertRotationsToInches(int rotations) const {
-	return rotations * m_inchesPerRev;
-}
-
-int GreyhillEncoder::ConvertInchesToRotations(const Translation2D& inches) {
-	return inches.getX() * m_ticksPerRev;
-}
-
-void GreyhillEncoder::SetEncoderRaw(int ticks) {
-	m_talon->SetPosition(ticks);
+void GreyhillEncoder::SetEncoderRaw(int ticks, int timeOut) {
+	m_talon->SetSelectedSensorPosition(ticks, 0, timeOut);
 }
 
 double GreyhillEncoder::GetSpeed() const {
-	return m_talon->GetSpeed();
+	return m_talon->GetSelectedSensorVelocity(0);
+}
+
+int GreyhillEncoder::GetRotations() const {
+	return ConvertTicksToRotations(GetPosition());
+}
+
+double GreyhillEncoder::ConvertRotationsToInches(double rotations) const {
+	return rotations * m_inchesPerRev;
+}
+
+double GreyhillEncoder::ConvertInchesToRotations(double inches) const {
+	return inches / m_inchesPerRev;
+}
+
+int GreyhillEncoder::ConvertRotationsToTicks(double rotations) const {
+	return rotations * m_ticksPerRev * 4; 								// four is to convert ticks to talon native units
+}
+
+double GreyhillEncoder::ConvertTicksToRotations(int ticks) const {
+	return ticks / (m_ticksPerRev * 4); 								// four is to convert ticks to talon native units
 }
 
 void GreyhillEncoder::Reset() {
