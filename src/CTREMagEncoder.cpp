@@ -9,7 +9,7 @@
 #include <CTREMagEncoder.h>
 #include <WPILib.h>
 
-CTREMagEncoder::CTREMagEncoder(CANTalon* talon, const std::string& name)
+CTREMagEncoder::CTREMagEncoder(TalonSRX* talon, const std::string& name)
 	: m_talon(talon), m_name(name) {
 
 	std::stringstream ss;
@@ -18,10 +18,10 @@ CTREMagEncoder::CTREMagEncoder(CANTalon* talon, const std::string& name)
 
 	m_offset = Rotation2D::fromDegrees(Preferences::GetInstance()->GetDouble(m_calibrationKey));
 
-	m_talon->SetFeedbackDevice(CANTalon::CtreMagEncoder_Absolute);
-	m_talon->SetSensorDirection(true);
-	m_talon->SetPulseWidthPosition(m_talon->GetPulseWidthPosition() & 0xFFF);
-	m_talon->SetStatusFrameRateMs(CANTalon::StatusFrameRateFeedback, 10);
+	m_talon->ConfigSelectedFeedbackSensor(CTRE_MagEncoder_Absolute, 0, 0);
+	m_talon->SetSensorPhase(true);
+	m_talon->SetSelectedSensorPosition(0, 0, 0);
+	m_talon->SetStatusFramePeriod(Status_2_Feedback0, 10, 0);
 }
 
 CTREMagEncoder::~CTREMagEncoder() {
@@ -44,7 +44,7 @@ int CTREMagEncoder::GetRotations() const {
 }
 
 int CTREMagEncoder::GetEncoderTicks(bool overflow) const {
-	int ticks = m_talon->GetPulseWidthPosition();
+	int ticks = m_talon->GetSelectedSensorPosition(0);
 	ticks *= -1; //negative b/c Pulse Width Position doesn't
 				 //take sensor direction into account
 	if (!overflow) {
@@ -84,5 +84,5 @@ int CTREMagEncoder::ConvertAngleToEncoderTicks(Rotation2D angle) {
 }
 
 void CTREMagEncoder::SetEncoderRaw(int ticks) {
-	m_talon->SetPulseWidthPosition(ticks);
+	m_talon->SetSelectedSensorPosition(ticks, 0, 0);
 }

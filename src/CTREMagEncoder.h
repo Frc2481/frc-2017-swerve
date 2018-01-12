@@ -8,17 +8,19 @@
 #ifndef SRC_CTREMAGENCODER_H_
 #define SRC_CTREMAGENCODER_H_
 #include "utils/Rotation2D.h"
-#include "CANTalon.h"
+#include "ctre/Phoenix.h"
 #include <string>
+
+using namespace ctre::phoenix::motorcontrol::can;
 
 class CTREMagEncoder {
 private:
-	CANTalon* m_talon;
+	TalonSRX* m_talon;
 	std::string m_name;
 	std::string m_calibrationKey;
 	Rotation2D m_offset;
 public:
-	CTREMagEncoder(CANTalon *talon, const std::string &name);
+	CTREMagEncoder(TalonSRX *talon, const std::string &name);
 	virtual ~CTREMagEncoder();
 	Rotation2D GetRawAngle() const;
 	Rotation2D GetAngle() const;
